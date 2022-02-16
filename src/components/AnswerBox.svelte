@@ -5,6 +5,10 @@
 <script lang="ts">
 	import clsx from 'clsx';
 
+	import CircleIcon from '../icons/CircleIcon.svelte';
+	import CheckIcon from '../icons/CheckIcon.svelte';
+	import XmarkIcon from '../icons/XmarkIcon.svelte';
+
 	export let value: string = '';
 	export let variant: AnswerBoxVariant = 'idle';
 
@@ -33,11 +37,22 @@
 <div
 	class={clsx(
 		'| root',
-		'| flex justify-center items-center',
+		'| relative | flex justify-center items-center',
 		'| w-full h-full',
 		`| ${backgroundStyle} ${borderStyle} uppercase text-neutral-100 text-2xl xxs:text-3xl xs:text-4xl`
 	)}
 >
+	<span
+		class="absolute bottom-0 left-0 | w-3 xxs:w-4 xs:w-5 h-3 xxs:h-4 xs:h-5 text-neutral-400"
+	>
+		{#if variant === 'correct'}
+			<CheckIcon />
+		{:else if variant === 'misplaced'}
+			<CircleIcon />
+		{:else if variant === 'wrong'}
+			<XmarkIcon />
+		{/if}
+	</span>
 	{value}
 </div>
 

@@ -14,7 +14,7 @@
 
 	// States
 	let answer: string = 'DOWER';
-	let guesses: Array<string> = [];
+	let guesses: Array<string> = ["DAWRE"];
 	let currentGuess: string = '';
 
 	let getGuessedLetterVariant = (letter: string, index: number) => {
