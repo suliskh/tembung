@@ -1,27 +1,27 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { decode } from '../lib/encryption';
+	import { MAX_ATTEMPT, VALID_LETTERS, WORD_LENGTH } from '$lib/constants';
 
 	import AnswerBox, { AnswerBoxVariant } from '../components/AnswerBox.svelte';
 	import KeypadButton, { KeypadButtonVariant } from '../components/KeypadButton.svelte';
 
-	const VALID_LETTERS = [
-		['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
-		['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-		['Z', 'X', 'C', 'V', 'B', 'N', 'M']
-	];
-	const MAX_ATTEMPT = 6;
-	const WORD_LENGTH = 5;
+	// Props
+	//
+	export let encryptedAnswer: string;
+	export let wordpool: Array<string>;
 
 	// States
-	let answer: string = 'DOWER';
-	let guesses: Array<string> = ["DAWRE"];
+	//
+	let guesses: Array<string> = [];
 	let currentGuess: string = '';
+	$: answer = decode(encryptedAnswer);
 
 	let getGuessedLetterVariant = (letter: string, index: number) => {
 		let variant: AnswerBoxVariant = 'idle';
 
-		let isIncluded = answer.includes(letter.toUpperCase());
-		let isCorrect = letter.toUpperCase() === answer[index]?.toUpperCase();
+		let isIncluded = answer.includes(letter.toLowerCase());
+		let isCorrect = letter.toLowerCase() === answer[index]?.toLowerCase();
 
 		if (isCorrect) {
 			variant = 'correct';
@@ -44,15 +44,15 @@
 	$: getButtonVariant = (letter: string): KeypadButtonVariant => {
 		let variant: KeypadButtonVariant = 'normal';
 
-		let indexOfLetter = answer.indexOf(letter.toUpperCase());
+		let indexOfLetter = answer.indexOf(letter.toLowerCase());
 		let isInAnswer = indexOfLetter >= 0;
-		let isInGuesses = guesses.join().toUpperCase().includes(letter.toUpperCase());
+		let isInGuesses = guesses.join().toLowerCase().includes(letter.toLowerCase());
 
 		if (isInGuesses && isInAnswer) {
 			variant = 'misplaced';
 
 			let isCorrect = guesses.some(
-				(guess) => guess[indexOfLetter]?.toUpperCase() === letter.toUpperCase()
+				(guess) => guess[indexOfLetter]?.toLowerCase() === letter.toLowerCase()
 			);
 
 			if (isCorrect) {
@@ -79,14 +79,21 @@
 
 	let submitGuess = () => {
 		if (currentGuess.length === WORD_LENGTH && guesses.length < MAX_ATTEMPT) {
-			guesses = [...guesses, currentGuess];
-			currentGuess = '';
+			const isValidWord = wordpool.includes(currentGuess);
+
+			if (isValidWord) {
+				guesses = [...guesses, currentGuess];
+				currentGuess = '';
+			} else {
+				// TODO: show toast
+				console.log('NOT VALID');
+			}
 		}
 	};
 
 	onMount(() => {
 		document.addEventListener('keydown', (e) => {
-			let key = e.key.toUpperCase();
+			let key = e.key.toLowerCase();
 
 			if (VALID_LETTERS.flat().join('').includes(key)) {
 				appendToAnswer(key);

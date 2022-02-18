@@ -39,7 +39,7 @@
 		'| root',
 		'| relative | flex justify-center items-center',
 		'| w-full h-full',
-		`| ${backgroundStyle} ${borderStyle} uppercase text-neutral-100 text-2xl xxs:text-3xl xs:text-4xl`
+		`| ${backgroundStyle} ${borderStyle} uppercase text-neutral-100 text-2xl xxs:text-3xl xs:text-4xl uppercase`
 	)}
 >
 	<span

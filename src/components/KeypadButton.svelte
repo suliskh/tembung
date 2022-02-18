@@ -36,7 +36,7 @@
 		style,
 		'| h-8 xxs:h-10 xs:h-12',
 		!isCustomWidth && 'w-6 xxs:w-7 xs:w-9',
-		`| rounded xs:rounded-lg ${backgroundStyle}  ${boxShadowStyle} text-sm xxs:text-lg xs:text-2xl ${textColorStyle}`
+		`| rounded xs:rounded-lg ${backgroundStyle}  ${boxShadowStyle} text-sm xxs:text-lg xs:text-2xl ${textColorStyle} uppercase`
 	)}
 	disabled={variant === 'disabled'}
 	type="button"
