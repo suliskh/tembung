@@ -107,7 +107,9 @@
 </script>
 
 <div class="w-screen min-h-screen | bg-surface">
-	<header />
+	<header>
+		<p>{answer}</p>
+	</header>
 	<main class="max-w-lg mx-auto | px-8">
 		<!-- Answer Boxes -->
 		<div class="answer-container | grid gap-2 grid-cols-5 grid-rows-6 | mb-8">
