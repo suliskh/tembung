@@ -22,6 +22,6 @@ export async function get() {
 	}
 
 	return {
-		body: { encryptedAnswer: 'YW5nZWw=', wordpool: ['angon', 'angob', 'dalan', 'aspal', 'eling'] }
+		body: { encryptedAnswer, wordpool }
 	};
 }
