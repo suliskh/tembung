@@ -106,7 +106,7 @@
 	});
 </script>
 
-<div class="w-screen min-h-screen | bg-surface">
+<div class="w-screen min-h-screen | bg-surface | font-sans">
 	<header />
 	<main class="max-w-lg mx-auto | px-8">
 		<!-- Answer Boxes -->
@@ -167,7 +167,7 @@
 					style="shrink-0 | w-10 xxs:w-11 xs:w-14"
 					on:click={() => popCurrentGuess()}>⌫</KeypadButton
 				>
-				{#each VALID_LETTERS[2] as letter, i (letter)}
+				{#each VALID_LETTERS[2] as letter (letter)}
 					<KeypadButton
 						style="shrink-0"
 						variant={getButtonVariant(letter)}

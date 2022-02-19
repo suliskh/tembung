@@ -1,6 +1,9 @@
 module.exports = {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
+		fontFamily: {
+			sans: ['Atkinson Hyperlegible', 'sans-serif']
+		},
 		extend: {
 			boxShadow: {
 				button: '0px 3px 0px #292524',
