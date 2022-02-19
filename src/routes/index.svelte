@@ -5,6 +5,8 @@
 
 	import AnswerBox, { AnswerBoxVariant } from '../components/AnswerBox.svelte';
 	import KeypadButton, { KeypadButtonVariant } from '../components/KeypadButton.svelte';
+	import DeleteIcon from '../icons/DeleteIcon.svelte';
+	import ReturnIcon from '../icons/ReturnIcon.svelte';
 
 	// Props
 	//
@@ -164,9 +166,12 @@
 			<div class="flex justify-center | space-x-1 xs:space-x-2">
 				<KeypadButton
 					isCustomWidth
-					style="shrink-0 | w-10 xxs:w-11 xs:w-14"
-					on:click={() => popCurrentGuess()}>⌫</KeypadButton
+					style="flex items-center justify-center shrink-0 | w-10 xxs:w-11 xs:w-14"
+					on:click={() => popCurrentGuess()}
 				>
+					<span class="w-em"><DeleteIcon /></span>
+					<span class="sr-only">Hapus</span>
+				</KeypadButton>
 				{#each VALID_LETTERS[2] as letter (letter)}
 					<KeypadButton
 						style="shrink-0"
@@ -176,9 +181,12 @@
 				{/each}
 				<KeypadButton
 					isCustomWidth
-					style="shrink-0 | w-10 xxs:w-11 xs:w-14"
-					on:click={() => submitGuess()}>↵</KeypadButton
+					style="flex items-center justify-center shrink-0 | w-10 xxs:w-11 xs:w-14"
+					on:click={() => submitGuess()}
 				>
+					<span class="w-em"><ReturnIcon /></span>
+					<span class="sr-only">Ok</span>
+				</KeypadButton>
 			</div>
 		</div>
 	</main>
