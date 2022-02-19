@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" width="1em">
+<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
 	<!-- https://icons.getbootstrap.com/ -->
 	<title>Check</title>
 	<path
