@@ -8,11 +8,11 @@ export async function get() {
 	let wordpool: Array<string> = [];
 
 	try {
-		const wordpoolPath = path.join(__dirname, 'data/wordpool.json');
+		const wordpoolPath = path.join(process.cwd(), 'data/wordpool.json');
 		const wordpoolData = fs.readFileSync(wordpoolPath, 'utf8');
 		wordpool = JSON.parse(wordpoolData);
 
-		const answersPath = path.join(__dirname, 'data/answers.json');
+		const answersPath = path.join(process.cwd(), 'data/answers.json');
 		const answersData = fs.readFileSync(answersPath, 'utf8');
 		const answers = JSON.parse(answersData);
 		const currentAnswer = answers[answers.length - 1];
