@@ -14,8 +14,7 @@
 		"scrap": "node ./scripts/scrap-wordpool.js"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "next",
-		"@sveltejs/adapter-vercel": "^1.0.0-next.43",
+		"@sveltejs/adapter-static": "^1.0.0-next.28",
 		"@sveltejs/kit": "next",
 		"@typescript-eslint/eslint-plugin": "^5.10.1",
 		"@typescript-eslint/parser": "^5.10.1",
