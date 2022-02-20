@@ -1,108 +1,76 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { decode } from '../lib/encryption';
-	import { MAX_ATTEMPT, VALID_LETTERS, WORD_LENGTH } from '$lib/constants';
 
-	import AnswerBox, { AnswerBoxVariant } from '../components/AnswerBox.svelte';
-	import KeypadButton, { KeypadButtonVariant } from '../components/KeypadButton.svelte';
+	import AnswerBox from '../components/AnswerBox.svelte';
+	import KeypadButton from '../components/KeypadButton.svelte';
 	import DeleteIcon from '../icons/DeleteIcon.svelte';
 	import ReturnIcon from '../icons/ReturnIcon.svelte';
 
+	import {
+		checkFocus,
+		decode,
+		KeypadLetter,
+		KeypadLetterStatus,
+		MAX_ATTEMPT,
+		VALID_LETTERS,
+		WORD_LENGTH
+	} from '$lib';
+	import { guessAttemptsStore } from '../stores';
+
 	// Props
 	//
-	export let encryptedAnswer: string;
-	export let wordpool: Array<string>;
+	export let encryptedAnswer: string = '';
+	export let wordpool: Array<string> = [];
 
 	// States
 	//
-	let guesses: Array<string> = [];
-	let currentGuess: string = '';
 	$: answer = decode(encryptedAnswer);
 
-	let getGuessedLetterVariant = (letter: string, index: number) => {
-		let variant: AnswerBoxVariant = 'idle';
+	let keypadLetters: Array<KeypadLetter> = VALID_LETTERS.map((letter) => ({
+		letter,
+		status: 'normal'
+	}));
 
-		let isIncluded = answer.includes(letter.toLowerCase());
-		let isCorrect = letter.toLowerCase() === answer[index]?.toLowerCase();
+	let revealKeypadLetterStatus = () => {
+		let revealedKeypadLetters = new Map<string, KeypadLetterStatus>();
 
-		if (isCorrect) {
-			variant = 'correct';
-		} else if (!isCorrect && isIncluded) {
-			variant = 'misplaced';
-		} else if (!isCorrect && !isIncluded) {
-			variant = 'wrong';
-		}
+		$guessAttemptsStore.forEach((guessAttempt) => {
+			guessAttempt.word.split('').forEach((letter, i) => {
+				let isNormal = revealedKeypadLetters.get(letter) === 'normal';
+				let isMisplaced = revealedKeypadLetters.get(letter) === 'misplaced';
+				let isEmpty = !Boolean(revealedKeypadLetters.get(letter));
 
-		return variant;
-	};
+				if (isEmpty || isMisplaced || isNormal) {
+					if (guessAttempt.statuses[i] === 'correct') {
+						revealedKeypadLetters.set(letter, 'correct');
+					} else if (guessAttempt.statuses[i] === 'wrong') {
+						revealedKeypadLetters.set(letter, 'disabled');
+					} else if (guessAttempt.statuses[i] === 'misplaced') {
+						revealedKeypadLetters.set(letter, 'misplaced');
+					}
+				}
+			});
+		});
 
-	let getCurrentGuessLetterVariant = (letter: string, i: number) => {
-		let isLastLetter = i === WORD_LENGTH - 1 && !!letter;
-		let isActive = i === currentGuess.length;
-
-		return isActive || isLastLetter ? 'focused' : 'idle';
-	};
-
-	$: getButtonVariant = (letter: string): KeypadButtonVariant => {
-		let variant: KeypadButtonVariant = 'normal';
-
-		let indexOfLetter = answer.indexOf(letter.toLowerCase());
-		let isInAnswer = indexOfLetter >= 0;
-		let isInGuesses = guesses.join().toLowerCase().includes(letter.toLowerCase());
-
-		if (isInGuesses && isInAnswer) {
-			variant = 'misplaced';
-
-			let isCorrect = guesses.some(
-				(guess) => guess[indexOfLetter]?.toLowerCase() === letter.toLowerCase()
-			);
-
-			if (isCorrect) {
-				variant = 'correct';
-			}
-		} else if (isInGuesses && !isInAnswer) {
-			variant = 'disabled';
-		}
-
-		return variant;
-	};
-
-	let appendToAnswer = (letter: string) => {
-		if (currentGuess.length < WORD_LENGTH) {
-			currentGuess += letter;
-		}
-	};
-
-	let popCurrentGuess = () => {
-		if (currentGuess.length > 0) {
-			currentGuess = currentGuess.substring(0, currentGuess.length - 1);
-		}
-	};
-
-	let submitGuess = () => {
-		if (currentGuess.length === WORD_LENGTH && guesses.length < MAX_ATTEMPT) {
-			const isValidWord = wordpool.includes(currentGuess);
-
-			if (isValidWord) {
-				guesses = [...guesses, currentGuess];
-				currentGuess = '';
-			} else {
-				// TODO: show toast
-				console.log('NOT VALID');
-			}
-		}
+		keypadLetters = keypadLetters.map(({ letter, status }) => ({
+			letter,
+			status: revealedKeypadLetters.get(letter) || status
+		}));
 	};
 
 	onMount(() => {
-		document.addEventListener('keydown', (e) => {
-			let key = e.key.toLowerCase();
+		guessAttemptsStore.revealAllGuess(answer);
+		revealKeypadLetterStatus();
 
-			if (VALID_LETTERS.flat().join('').includes(key)) {
-				appendToAnswer(key);
-			} else if (e.code === 'Enter') {
-				submitGuess();
+		document.addEventListener('keydown', (e) => {
+			if (e.code === 'Enter') {
+				guessAttemptsStore.revealCurrentGuess(answer, wordpool);
+				revealKeypadLetterStatus();
 			} else if (e.code === 'Backspace') {
-				popCurrentGuess();
+				// TODO: pop letter from the current guess
+				guessAttemptsStore.removeLastLetterFromCurrentGuess();
+			} else {
+				guessAttemptsStore.appendLetterToCurrentGuess(e.key.toLowerCase());
 			}
 		});
 	});
@@ -113,30 +81,27 @@
 	<main class="max-w-lg mx-auto | px-8">
 		<!-- Answer Boxes -->
 		<div class="answer-container | grid gap-2 grid-cols-5 grid-rows-6 | mb-8">
-			<!-- Guessed -->
-			{#each guesses as guess, i (i)}
+			<!-- Guess Attempts -->
+			{#each $guessAttemptsStore as attempt, i (i)}
 				<div class="contents">
-					{#each Array(WORD_LENGTH).fill(1) as _x, j (j)}
-						<AnswerBox value={guess[j]} variant={getGuessedLetterVariant(guess[j], j)} />
+					{#each Array(WORD_LENGTH).fill(1) as _x, letterIndex (letterIndex)}
+						<AnswerBox
+							isRevealed={attempt.isRevealed}
+							order={letterIndex}
+							status={attempt.statuses[letterIndex]}
+							value={attempt.word[letterIndex] || ''}
+							isFocused={checkFocus(letterIndex, attempt.word, attempt.isRevealed)}
+						/>
 					{/each}
 				</div>
 			{/each}
 
-			<!-- Current Guess -->
-			{#if guesses.length < MAX_ATTEMPT}
-				<div class="contents">
-					{#each Array(WORD_LENGTH).fill(1) as _x, i (i)}
-						<AnswerBox
-							value={currentGuess[i] || ''}
-							variant={getCurrentGuessLetterVariant(currentGuess[i], i)}
-						/>
-					{/each}
-				</div>
-				<!-- Remaining -->
-				{#each Array(MAX_ATTEMPT - guesses.length - 1).fill(1) as _x, i (i)}
+			<!-- Remaining -->
+			{#if $guessAttemptsStore.length < MAX_ATTEMPT}
+				{#each Array(MAX_ATTEMPT - $guessAttemptsStore.length).fill(1) as i}
 					<div class="contents">
-						{#each Array(WORD_LENGTH).fill(1) as _x, j (j)}
-							<AnswerBox value="" variant="idle" />
+						{#each Array(WORD_LENGTH).fill(1) as _x}
+							<AnswerBox status="idle" value="" isFocused={false} />
 						{/each}
 					</div>
 				{/each}
@@ -146,20 +111,24 @@
 		<!-- Keypad -->
 		<div class="space-y-2 xs:space-y-3">
 			<div class="flex justify-center | space-x-1 xs:space-x-2">
-				{#each VALID_LETTERS[0] as letter, i (letter)}
+				{#each keypadLetters.slice(0, 10) as keypadLetter, i (i)}
 					<KeypadButton
 						style="shrink-0"
-						variant={getButtonVariant(letter)}
-						on:click={() => appendToAnswer(letter)}>{letter}</KeypadButton
+						status={keypadLetter.status}
+						on:click={() =>
+							guessAttemptsStore.appendLetterToCurrentGuess(keypadLetter.letter.toLowerCase())}
+						>{keypadLetter.letter}</KeypadButton
 					>
 				{/each}
 			</div>
 			<div class="flex justify-center | space-x-1 xs:space-x-2">
-				{#each VALID_LETTERS[1] as letter, i (letter)}
+				{#each keypadLetters.slice(10, 19) as keypadLetter, i (i)}
 					<KeypadButton
 						style="shrink-0"
-						variant={getButtonVariant(letter)}
-						on:click={() => appendToAnswer(letter)}>{letter}</KeypadButton
+						status={keypadLetter.status}
+						on:click={() =>
+							guessAttemptsStore.appendLetterToCurrentGuess(keypadLetter.letter.toLowerCase())}
+						>{keypadLetter.letter}</KeypadButton
 					>
 				{/each}
 			</div>
@@ -167,22 +136,24 @@
 				<KeypadButton
 					isCustomWidth
 					style="flex items-center justify-center shrink-0 | w-10 xxs:w-11 xs:w-14"
-					on:click={() => popCurrentGuess()}
+					on:click={() => guessAttemptsStore.removeLastLetterFromCurrentGuess()}
 				>
 					<span class="w-em"><DeleteIcon /></span>
 					<span class="sr-only">Hapus</span>
 				</KeypadButton>
-				{#each VALID_LETTERS[2] as letter (letter)}
+				{#each keypadLetters.slice(19, 26) as keypadLetter, i (i)}
 					<KeypadButton
 						style="shrink-0"
-						variant={getButtonVariant(letter)}
-						on:click={() => appendToAnswer(letter)}>{letter}</KeypadButton
+						status={keypadLetter.status}
+						on:click={() =>
+							guessAttemptsStore.appendLetterToCurrentGuess(keypadLetter.letter.toLowerCase())}
+						>{keypadLetter.letter}</KeypadButton
 					>
 				{/each}
 				<KeypadButton
 					isCustomWidth
 					style="flex items-center justify-center shrink-0 | w-10 xxs:w-11 xs:w-14"
-					on:click={() => submitGuess()}
+					on:click={() => guessAttemptsStore.revealCurrentGuess(answer, wordpool)}
 				>
 					<span class="w-em"><ReturnIcon /></span>
 					<span class="sr-only">Ok</span>

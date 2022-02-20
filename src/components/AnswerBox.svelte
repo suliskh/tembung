@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-	export type AnswerBoxStatus = 'idle' | 'correct' | 'misplaced' | 'wrong';
-</script>
-
 <script lang="ts">
 	import clsx from 'clsx';
 
@@ -9,10 +5,14 @@
 	import CheckIcon from '../icons/CheckIcon.svelte';
 	import XmarkIcon from '../icons/XmarkIcon.svelte';
 
+	import type { GuessLetterStatus } from '$lib';
+
+	// Props
+	//
 	export let isFocused: boolean = false;
 	export let isRevealed: boolean = false;
 	export let order: number = 1;
-	export let status: AnswerBoxStatus = 'idle';
+	export let status: GuessLetterStatus = 'idle';
 	export let value: string = '';
 
 	let backgroundStyle = 'bg-stone-900';

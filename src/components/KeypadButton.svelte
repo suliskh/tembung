@@ -1,19 +1,19 @@
-<script context="module" lang="ts">
-	export type KeypadButtonVariant = 'correct' | 'disabled' | 'misplaced' | 'normal';
-</script>
-
 <script lang="ts">
 	import clsx from 'clsx';
 
+	import type { KeypadLetterStatus } from '$lib';
+
+	// Props
+	//
 	export let isCustomWidth: boolean = false;
 	export let style: string = '';
-	export let variant: KeypadButtonVariant = 'normal';
+	export let status: KeypadLetterStatus = 'normal';
 
 	let backgroundStyle = '';
 	let boxShadowStyle = 'shadow-button active:shadow-button-active';
 	let textColorStyle = 'text-neutral-100 active:text-neutral-300';
 
-	$: switch (variant) {
+	$: switch (status) {
 		case 'correct':
 			backgroundStyle = 'bg-emerald-800';
 			break;
@@ -38,7 +38,7 @@
 		!isCustomWidth && 'w-6 xxs:w-7 xs:w-9',
 		`| rounded xs:rounded-lg ${backgroundStyle}  ${boxShadowStyle} text-sm xxs:text-lg xs:text-2xl ${textColorStyle} uppercase`
 	)}
-	disabled={variant === 'disabled'}
+	disabled={status === 'disabled'}
 	type="button"
 	on:click
 >
