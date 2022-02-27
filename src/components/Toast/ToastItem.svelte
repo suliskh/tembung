@@ -17,7 +17,7 @@
 {#if isVisible}
 	<div
 		transition:fade
-		class=" max-w-lg px-3 py-1 | rounded-xl border border-amber-500 bg-amber-100 text-neutral-700 shadow-md shadow-amber-400/40"
+		class="max-w-lg px-3 py-1 | rounded-xl border border-amber-500 bg-amber-100 text-neutral-700 shadow-md shadow-amber-400/40"
 	>
 		{content}
 	</div>
