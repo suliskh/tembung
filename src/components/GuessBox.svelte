@@ -64,10 +64,13 @@
 	>
 		<span class="absolute bottom-0 left-0 | w-3 xxs:w-4 xs:w-5 h-3 xxs:h-4 xs:h-5 text-neutral-400">
 			{#if status === 'correct'}
+				<span class="sr-only">Benar</span>
 				<CheckIcon />
 			{:else if status === 'misplaced'}
+				<span class="sr-only">Salah tempat</span>
 				<CircleIcon />
 			{:else if status === 'wrong'}
+				<span class="sr-only">Salah</span>
 				<XmarkIcon />
 			{/if}
 		</span>
