@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	import AnswerBox from '../components/AnswerBox.svelte';
 	import KeypadButton from '../components/KeypadButton.svelte';
@@ -16,7 +16,7 @@
 		VALID_LETTERS,
 		WORD_LENGTH
 	} from '$lib';
-	import { guessAttemptsStore } from '../stores';
+	import { animateWrongGuessStore, guessAttemptsStore } from '../stores';
 
 	// Props
 	//
@@ -25,7 +25,19 @@
 
 	// States
 	//
+	let animateWrongGuessTimer = null;
 	$: answer = decode(encryptedAnswer);
+
+	const unsubscribeAnimateWrongGuessStore = animateWrongGuessStore.subscribe(
+		(animateWrongGuess) => {
+			if (animateWrongGuess) {
+				clearTimeout(animateWrongGuessTimer);
+				setTimeout(() => animateWrongGuessStore.update(() => false), 1000);
+			}
+		}
+	);
+
+	onDestroy(unsubscribeAnimateWrongGuessStore);
 
 	let keypadLetters: Array<KeypadLetter> = VALID_LETTERS.map((letter) => ({
 		letter,
@@ -83,15 +95,16 @@
 		<!-- Answer Boxes -->
 		<div class="answer-container | grid gap-2 grid-cols-5 grid-rows-6 | mb-8">
 			<!-- Guess Attempts -->
-			{#each $guessAttemptsStore as attempt, i (i)}
+			{#each $guessAttemptsStore as attempt, guessIndex (guessIndex)}
 				<div class="contents">
 					{#each Array(WORD_LENGTH).fill(1) as _x, letterIndex (letterIndex)}
 						<AnswerBox
+							isShaked={guessIndex === $guessAttemptsStore.length - 1 && $animateWrongGuessStore}
+							isFocused={checkFocus(letterIndex, attempt.word, attempt.isRevealed)}
 							isRevealed={attempt.isRevealed}
 							order={letterIndex}
 							status={attempt.statuses[letterIndex]}
 							value={attempt.word[letterIndex] || ''}
-							isFocused={checkFocus(letterIndex, attempt.word, attempt.isRevealed)}
 						/>
 					{/each}
 				</div>
@@ -102,7 +115,7 @@
 				{#each Array(MAX_ATTEMPT - $guessAttemptsStore.length).fill(1) as i}
 					<div class="contents">
 						{#each Array(WORD_LENGTH).fill(1) as _x}
-							<AnswerBox status="idle" value="" isFocused={false} />
+							<AnswerBox isFocused={false} status="idle" value="" />
 						{/each}
 					</div>
 				{/each}
