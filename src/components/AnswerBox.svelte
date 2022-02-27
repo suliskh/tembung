@@ -10,6 +10,7 @@
 	// Props
 	//
 	export let isFocused: boolean = false;
+	export let isShaked: boolean = false;
 	export let isRevealed: boolean = false;
 	export let order: number = 1;
 	export let status: GuessLetterStatus = 'idle';
@@ -35,7 +36,7 @@
 </script>
 
 <div
-	class={clsx('| root', '| relative w-full h-full')}
+	class={clsx('| root', '| relative w-full h-full', isShaked ? '| shaked' : '')}
 	class:revealed={isRevealed}
 	style={`--animation-order: ${order}`}
 >
@@ -83,6 +84,10 @@
 	.root.revealed {
 		transform: rotateY(180deg);
 	}
+	.root.shaked {
+		animation: shake 0.25s;
+		animation-iteration-count: infinite;
+	}
 
 	.box::before {
 		content: '';
@@ -98,5 +103,20 @@
 	}
 	.box.box-back {
 		transform: rotateY(180deg);
+	}
+
+	@keyframes shake {
+		0% {
+			transform: translateX(0);
+		}
+		25% {
+			transform: translateX(-4px);
+		}
+		75% {
+			transform: translateX(4px);
+		}
+		100% {
+			transform: translateX(0);
+		}
 	}
 </style>
