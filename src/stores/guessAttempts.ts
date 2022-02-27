@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 
 import { getGuessStatuses, GuessAttempt, MAX_ATTEMPT, VALID_LETTERS, WORD_LENGTH } from '$lib';
+import { toastStore } from '../components/Toast';
 
 const EMPTY_GUESS_ATTEMPT: GuessAttempt = {
 	isRevealed: false,
@@ -73,8 +74,11 @@ function createGuessAttemptsStore() {
 				let currentIndex = guessAttempts.length - 1;
 				let currentGuess = guessAttempts[currentIndex];
 				let isValidWord = wordpool.includes(currentGuess.word);
+				let isValidLength = currentGuess.word?.length === WORD_LENGTH;
 
-				if (isValidWord) {
+				if (!isValidLength) {
+					toastStore.push('Hurufmu kurang, Cuk!');
+				} else if (isValidWord) {
 					guessAttempts[currentIndex] = {
 						...currentGuess,
 						isRevealed: true,
@@ -85,8 +89,7 @@ function createGuessAttemptsStore() {
 						guessAttempts = [...guessAttempts, EMPTY_GUESS_ATTEMPT];
 					}
 				} else {
-					// TODO: show error toast
-					console.log('Your guess is not in the wordpool');
+					toastStore.push('Salah, Cuk!');
 				}
 
 				return guessAttempts;

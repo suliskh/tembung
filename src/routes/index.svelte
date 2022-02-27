@@ -5,6 +5,7 @@
 	import KeypadButton from '../components/KeypadButton.svelte';
 	import DeleteIcon from '../icons/DeleteIcon.svelte';
 	import ReturnIcon from '../icons/ReturnIcon.svelte';
+	import { ToastContainer } from '../components/Toast';
 
 	import {
 		checkFocus,
@@ -162,3 +163,5 @@
 		</div>
 	</main>
 </div>
+
+<ToastContainer />
