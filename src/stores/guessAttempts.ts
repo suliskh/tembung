@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 import { getGuessStatuses, GuessAttempt, MAX_ATTEMPT, VALID_LETTERS, WORD_LENGTH } from '$lib';
 import { toastStore } from '../components/Toast';
+import { animateWrongGuessStore } from './animateWrongGuess';
 
 const EMPTY_GUESS_ATTEMPT: GuessAttempt = {
 	isRevealed: false,
@@ -78,6 +79,7 @@ function createGuessAttemptsStore() {
 
 				if (!isValidLength) {
 					toastStore.push('Hurufmu kurang, Cuk!');
+					animateWrongGuessStore.update(() => true);
 				} else if (isValidWord) {
 					guessAttempts[currentIndex] = {
 						...currentGuess,
@@ -90,6 +92,7 @@ function createGuessAttemptsStore() {
 					}
 				} else {
 					toastStore.push('Salah, Cuk!');
+					animateWrongGuessStore.update(() => true);
 				}
 
 				return guessAttempts;
