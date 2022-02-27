@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 
-	import AnswerBox from '../components/AnswerBox.svelte';
+	import GuessBox from '../components/GuessBox.svelte';
 	import KeypadButton from '../components/KeypadButton.svelte';
 	import DeleteIcon from '../icons/DeleteIcon.svelte';
 	import ReturnIcon from '../icons/ReturnIcon.svelte';
@@ -98,7 +98,7 @@
 			{#each $guessAttemptsStore as attempt, guessIndex (guessIndex)}
 				<div class="contents">
 					{#each Array(WORD_LENGTH).fill(1) as _x, letterIndex (letterIndex)}
-						<AnswerBox
+						<GuessBox
 							isShaked={guessIndex === $guessAttemptsStore.length - 1 && $animateWrongGuessStore}
 							isFocused={checkFocus(letterIndex, attempt.word, attempt.isRevealed)}
 							isRevealed={attempt.isRevealed}
@@ -115,7 +115,7 @@
 				{#each Array(MAX_ATTEMPT - $guessAttemptsStore.length).fill(1) as i}
 					<div class="contents">
 						{#each Array(WORD_LENGTH).fill(1) as _x}
-							<AnswerBox isFocused={false} status="idle" value="" />
+							<GuessBox isFocused={false} status="idle" value="" />
 						{/each}
 					</div>
 				{/each}
