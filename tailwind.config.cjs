@@ -18,6 +18,10 @@ module.exports = {
 			},
 			width: {
 				em: '1em'
+			},
+			zIndex: {
+				modal: 1300,
+				toast: 1400
 			}
 		}
 	},
