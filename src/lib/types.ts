@@ -19,3 +19,5 @@ export type WordDetail = {
 	types: Array<string>;
 	word: string;
 };
+
+export type GameStatus = 'playing' | 'answered-wrong' | 'answered-correct';

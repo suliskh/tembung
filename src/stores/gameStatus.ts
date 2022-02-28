@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
 
-export type GameStatus = 'not-started' | 'playing' | 'finished';
+import type { GameStatus } from '$lib';
 
-export const gameStatusStore = writable<GameStatus>('not-started');
+export const gameStatusStore = writable<GameStatus>('playing');

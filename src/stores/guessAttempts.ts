@@ -1,6 +1,13 @@
 import { writable } from 'svelte/store';
 
-import { getGuessStatuses, GuessAttempt, MAX_ATTEMPT, VALID_LETTERS, WORD_LENGTH } from '$lib';
+import {
+	getGuessStatuses,
+	GameStatus,
+	GuessAttempt,
+	MAX_ATTEMPT,
+	VALID_LETTERS,
+	WORD_LENGTH
+} from '$lib';
 import { toastStore } from '../components/Toast';
 import { animateWrongGuessStore } from './animateWrongGuess';
 import { gameStatusStore } from './gameStatus';
@@ -55,35 +62,70 @@ function createGuessAttemptsStore() {
 			}),
 		revealAllGuess: (answer: string) =>
 			/**
-			 * Set isRevealed to true for all completed guesses
+			 * [1] 	Check if the there is some guess that is equal to the answer.
+			 * 		If true, set the gameStatus to `answered-correct`.
+			 * 		If false and the attempts count is reaching the MAX_ATTEMPT,
+			 * 		set the gameStatus to `answered-wrong`.
+			 * 		Otherwise, set the gameStatus to `playing`.
+			 *
+			 * [2] 	Set isRevealed to true for all completed guesses
 			 */
-
 			{
-				update((guessAttempts: Array<GuessAttempt>) =>
-					guessAttempts.map((guess) => {
-						if (guess.word === answer) {
-							gameStatusStore.update(() => 'finished');
-						}
+				update((guessAttempts: Array<GuessAttempt>) => {
+					// [1]
+					//
+					let isAnyCorrectAnswers = guessAttempts.some((guess) => guess.word === answer);
+					let newGameStatus: GameStatus = 'playing';
 
+					if (isAnyCorrectAnswers) {
+						newGameStatus = 'answered-correct';
+					} else if (guessAttempts.length >= MAX_ATTEMPT) {
+						newGameStatus = 'answered-wrong';
+					}
+					gameStatusStore.update(() => newGameStatus);
+
+					// [2]
+					//
+					return guessAttempts.map((guess) => {
 						return {
 							...guess,
 							isRevealed: guess.word.length === WORD_LENGTH ? true : false,
 							statuses: getGuessStatuses(guess.word, answer)
 						};
-					})
-				);
+					});
+				});
 			},
 		revealCurrentGuess: (answer: string, wordpool: Array<string>) =>
 			/**
-			 * Check if the guess is a valid word (i.e. included in the wordpool)
-			 * If true, reveal the guess and append an empty guess
-			 * Otherwise, show error toast
+			 * [1] 	Check if the current guess is equal to the answer.
+			 * 		If true, set the gameStatus to `answered-correct`.
+			 * 		If false and the attempts count is reaching the MAX_ATTEMPT,
+			 * 		set the gameStatus to `answered-wrong`.
+			 * 		Otherwise, set the gameStatus to `playing`.
+			 *
+			 * [2] 	Check if the guess is a valid word (i.e. included in the wordpool).
+			 * 		If true, reveal the guess and append an empty guess.
+			 * 		Otherwise, show error toast and animate the current guess boxes.
 			 */
-
 			{
 				update((guessAttempts: Array<GuessAttempt>) => {
 					let currentIndex = guessAttempts.length - 1;
 					let currentGuess = guessAttempts[currentIndex];
+
+					// [1]
+					//
+					let isAnyCorrectAnswers = currentGuess.word === answer;
+					let newGameStatus: GameStatus = 'playing';
+
+					if (isAnyCorrectAnswers) {
+						newGameStatus = 'answered-correct';
+					} else if (guessAttempts.length >= MAX_ATTEMPT) {
+						newGameStatus = 'answered-wrong';
+					}
+					gameStatusStore.update(() => newGameStatus);
+
+					// [2]
+					//
 					let isValidWord = wordpool.includes(currentGuess.word);
 					let isValidLength = currentGuess.word?.length === WORD_LENGTH;
 
@@ -103,10 +145,6 @@ function createGuessAttemptsStore() {
 					} else {
 						toastStore.push('Salah, Cuk!');
 						animateWrongGuessStore.update(() => true);
-					}
-
-					if (currentGuess.word === answer) {
-						gameStatusStore.update(() => 'finished');
 					}
 
 					return guessAttempts;
