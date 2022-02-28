@@ -20,7 +20,7 @@
 		case 'wrong':
 			backgroundStyle = 'bg-stone-800';
 			textColorStyle = 'text-neutral-500';
-			boxShadowStyle = '';
+			boxShadowStyle = 'shadow-button-wrong active:shadow-button-active';
 			break;
 		case 'misplaced':
 			backgroundStyle = 'bg-yellow-700';
