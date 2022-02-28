@@ -17,6 +17,7 @@
 		GuessLetterStatus,
 		KeypadLetter,
 		MAX_ATTEMPT,
+		STORAGE_KEY_GUESS_ATTEMPTS,
 		VALID_LETTERS,
 		WORD_LENGTH
 	} from '$lib';
@@ -80,8 +81,6 @@
 			letter,
 			status: revealedKeypadLettersStatus.get(letter) || status
 		}));
-
-		console.log(keypadLetters)
 	};
 
 	let revealCurrentGuess = () => {
@@ -115,6 +114,11 @@
 	};
 
 	onMount(() => {
+		let storedGuessWords = localStorage.getItem(STORAGE_KEY_GUESS_ATTEMPTS);
+		if (storedGuessWords) {
+			guessAttemptsStore.addAllWords(JSON.parse(storedGuessWords));
+		}
+
 		guessAttemptsStore.revealAllGuess(answer);
 		revealKeypadLetterStatus();
 

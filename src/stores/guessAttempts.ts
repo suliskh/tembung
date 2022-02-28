@@ -5,6 +5,7 @@ import {
 	GameStatus,
 	GuessAttempt,
 	MAX_ATTEMPT,
+	STORAGE_KEY_GUESS_ATTEMPTS,
 	VALID_LETTERS,
 	WORD_LENGTH
 } from '$lib';
@@ -22,7 +23,22 @@ function createGuessAttemptsStore() {
 	const { subscribe, set, update } = writable<Array<GuessAttempt>>([EMPTY_GUESS_ATTEMPT]);
 
 	return {
-		subscribe,
+		addAllWords: (allWords: Array<string>) => {
+			/**
+			 * Add all words as the guessAttempts
+			 */
+
+			let guessAttempts = allWords.map((word: string) => ({
+				...EMPTY_GUESS_ATTEMPT,
+				word
+			}));
+
+			if (guessAttempts.length < MAX_ATTEMPT) {
+				guessAttempts.push(EMPTY_GUESS_ATTEMPT);
+			}
+
+			set(guessAttempts);
+		},
 		appendLetterToCurrentGuess: (letter: string) =>
 			/**
 			 * If the letter is valid and the current guess is not completed
@@ -98,7 +114,7 @@ function createGuessAttemptsStore() {
 		revealCurrentGuess: (answer: string, wordpool: Array<string>) =>
 			/**
 			 * [1] 	Check if the current guess is equal to the answer.
-			 * 		If true, set the gameStatus to `answered-correct`.
+			 * 		If true, set the gameStatus to `answered-correct` and persist the word in localStorage.
 			 * 		If false and the attempts count is reaching the MAX_ATTEMPT,
 			 * 		set the gameStatus to `answered-wrong`.
 			 * 		Otherwise, set the gameStatus to `playing`.
@@ -139,6 +155,10 @@ function createGuessAttemptsStore() {
 							statuses: getGuessStatuses(currentGuess.word, answer)
 						};
 
+						let allGuessWords = guessAttempts.map((guessAttempt) => guessAttempt.word);
+
+						localStorage.setItem(STORAGE_KEY_GUESS_ATTEMPTS, JSON.stringify(allGuessWords));
+
 						if (guessAttempts.length < MAX_ATTEMPT) {
 							guessAttempts = [...guessAttempts, EMPTY_GUESS_ATTEMPT];
 						}
@@ -150,7 +170,8 @@ function createGuessAttemptsStore() {
 					return guessAttempts;
 				});
 			},
-		reset: () => set([EMPTY_GUESS_ATTEMPT])
+		reset: () => set([EMPTY_GUESS_ATTEMPT]),
+		subscribe
 	};
 }
 
