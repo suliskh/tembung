@@ -12,7 +12,7 @@
 
 {#if isOpen}
 	<div
-		class="fixed top-0 left-0 w-screen h-screen z-modal | p-3 | flex items-center justify-center | bg-zinc-900/80"
+		class="fixed top-0 left-0 w-screen h-screen z-modal | p-3 | flex items-center justify-center | bg-zinc-900/95"
 		transition:fade
 	>
 		<div
