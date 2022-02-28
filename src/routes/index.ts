@@ -16,7 +16,16 @@ export async function get() {
 		const answersData = fs.readFileSync(answersPath, 'utf8');
 		const answers = JSON.parse(answersData);
 		const currentAnswer = answers[answers.length - 1];
-		encryptedAnswer = encode(currentAnswer);
+		encryptedAnswer = encode(
+			currentAnswer,
+			{
+				indonesianTranslation: 'Besar',
+				phoneticTranscription: 'a-eo-geng',
+				types: ['nomina'],
+				word: currentAnswer
+			},
+			new Date()
+		);
 	} catch (err) {
 		console.error(err);
 	}

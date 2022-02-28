@@ -12,3 +12,10 @@ export type KeypadLetter = {
 	letter: string;
 	status: KeypadLetterStatus;
 };
+
+export type WordDetail = {
+	indonesianTranslation: string;
+	phoneticTranscription: string;
+	types: Array<string>;
+	word: string;
+};
