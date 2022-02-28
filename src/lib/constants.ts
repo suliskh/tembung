@@ -28,3 +28,5 @@ export const VALID_LETTERS: Array<string> = [
 ];
 export const MAX_ATTEMPT: number = 6;
 export const WORD_LENGTH: number = 5;
+
+export const STORAGE_KEY_GUESS_ATTEMPTS = 'guEssAtt3mpts';
