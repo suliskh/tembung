@@ -207,8 +207,8 @@
 					isCustomWidth
 					style="flex items-center justify-center shrink-0 | w-10 xxs:w-11 xs:w-14"
 					on:click={() => {
-						revealKeypadLetterStatus();
 						revealCurrentGuess();
+						revealKeypadLetterStatus();
 					}}
 				>
 					<span class="w-em"><ReturnIcon /></span>
