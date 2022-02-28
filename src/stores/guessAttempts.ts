@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 import { getGuessStatuses, GuessAttempt, MAX_ATTEMPT, VALID_LETTERS, WORD_LENGTH } from '$lib';
 import { toastStore } from '../components/Toast';
 import { animateWrongGuessStore } from './animateWrongGuess';
+import { gameStatusStore } from './gameStatus';
 
 const EMPTY_GUESS_ATTEMPT: GuessAttempt = {
 	isRevealed: false,
@@ -57,13 +58,21 @@ function createGuessAttemptsStore() {
 			 * Set isRevealed to true for all completed guesses
 			 */
 
-			update((guessAttempts: Array<GuessAttempt>) =>
-				guessAttempts.map((guess) => ({
-					...guess,
-					isRevealed: guess.word.length === WORD_LENGTH ? true : false,
-					statuses: getGuessStatuses(guess.word, answer)
-				}))
-			),
+			{
+				update((guessAttempts: Array<GuessAttempt>) =>
+					guessAttempts.map((guess) => {
+						if (guess.word === answer) {
+							gameStatusStore.update(() => 'finished');
+						}
+
+						return {
+							...guess,
+							isRevealed: guess.word.length === WORD_LENGTH ? true : false,
+							statuses: getGuessStatuses(guess.word, answer)
+						};
+					})
+				);
+			},
 		revealCurrentGuess: (answer: string, wordpool: Array<string>) =>
 			/**
 			 * Check if the guess is a valid word (i.e. included in the wordpool)
@@ -71,32 +80,38 @@ function createGuessAttemptsStore() {
 			 * Otherwise, show error toast
 			 */
 
-			update((guessAttempts: Array<GuessAttempt>) => {
-				let currentIndex = guessAttempts.length - 1;
-				let currentGuess = guessAttempts[currentIndex];
-				let isValidWord = wordpool.includes(currentGuess.word);
-				let isValidLength = currentGuess.word?.length === WORD_LENGTH;
+			{
+				update((guessAttempts: Array<GuessAttempt>) => {
+					let currentIndex = guessAttempts.length - 1;
+					let currentGuess = guessAttempts[currentIndex];
+					let isValidWord = wordpool.includes(currentGuess.word);
+					let isValidLength = currentGuess.word?.length === WORD_LENGTH;
 
-				if (!isValidLength) {
-					toastStore.push('Hurufmu kurang, Cuk!');
-					animateWrongGuessStore.update(() => true);
-				} else if (isValidWord) {
-					guessAttempts[currentIndex] = {
-						...currentGuess,
-						isRevealed: true,
-						statuses: getGuessStatuses(currentGuess.word, answer)
-					};
+					if (!isValidLength) {
+						toastStore.push('Hurufmu kurang, Cuk!');
+						animateWrongGuessStore.update(() => true);
+					} else if (isValidWord) {
+						guessAttempts[currentIndex] = {
+							...currentGuess,
+							isRevealed: true,
+							statuses: getGuessStatuses(currentGuess.word, answer)
+						};
 
-					if (guessAttempts.length < MAX_ATTEMPT) {
-						guessAttempts = [...guessAttempts, EMPTY_GUESS_ATTEMPT];
+						if (guessAttempts.length < MAX_ATTEMPT) {
+							guessAttempts = [...guessAttempts, EMPTY_GUESS_ATTEMPT];
+						}
+					} else {
+						toastStore.push('Salah, Cuk!');
+						animateWrongGuessStore.update(() => true);
 					}
-				} else {
-					toastStore.push('Salah, Cuk!');
-					animateWrongGuessStore.update(() => true);
-				}
 
-				return guessAttempts;
-			}),
+					if (currentGuess.word === answer) {
+						gameStatusStore.update(() => 'finished');
+					}
+
+					return guessAttempts;
+				});
+			},
 		reset: () => set([EMPTY_GUESS_ATTEMPT])
 	};
 }
