@@ -14,8 +14,8 @@
 		checkFocus,
 		decode,
 		getSecondsToTomorrow,
+		GuessLetterStatus,
 		KeypadLetter,
-		KeypadLetterStatus,
 		MAX_ATTEMPT,
 		VALID_LETTERS,
 		WORD_LENGTH
@@ -52,25 +52,25 @@
 
 	let keypadLetters: Array<KeypadLetter> = VALID_LETTERS.map((letter) => ({
 		letter,
-		status: 'normal'
+		status: 'idle'
 	}));
 
 	let revealKeypadLetterStatus = () => {
-		let revealedKeypadLetters = new Map<string, KeypadLetterStatus>();
+		let revealedKeypadLettersStatus = new Map<string, GuessLetterStatus>();
 
 		$guessAttemptsStore.forEach((guessAttempt) => {
 			guessAttempt.word.split('').forEach((letter, i) => {
-				let isNormal = revealedKeypadLetters.get(letter) === 'normal';
-				let isMisplaced = revealedKeypadLetters.get(letter) === 'misplaced';
-				let isEmpty = !Boolean(revealedKeypadLetters.get(letter));
+				let isNormal = revealedKeypadLettersStatus.get(letter) === 'idle';
+				let isMisplaced = revealedKeypadLettersStatus.get(letter) === 'misplaced';
+				let isEmpty = !Boolean(revealedKeypadLettersStatus.get(letter));
 
 				if (isEmpty || isMisplaced || isNormal) {
 					if (guessAttempt.statuses[i] === 'correct') {
-						revealedKeypadLetters.set(letter, 'correct');
+						revealedKeypadLettersStatus.set(letter, 'correct');
 					} else if (guessAttempt.statuses[i] === 'wrong') {
-						revealedKeypadLetters.set(letter, 'disabled');
+						revealedKeypadLettersStatus.set(letter, 'wrong');
 					} else if (guessAttempt.statuses[i] === 'misplaced') {
-						revealedKeypadLetters.set(letter, 'misplaced');
+						revealedKeypadLettersStatus.set(letter, 'misplaced');
 					}
 				}
 			});
@@ -78,8 +78,10 @@
 
 		keypadLetters = keypadLetters.map(({ letter, status }) => ({
 			letter,
-			status: revealedKeypadLetters.get(letter) || status
+			status: revealedKeypadLettersStatus.get(letter) || status
 		}));
+
+		console.log(keypadLetters)
 	};
 
 	let revealCurrentGuess = () => {

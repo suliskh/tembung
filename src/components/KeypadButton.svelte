@@ -1,13 +1,13 @@
 <script lang="ts">
 	import clsx from 'clsx';
 
-	import type { KeypadLetterStatus } from '$lib';
+	import type { GuessLetterStatus } from '$lib';
 
 	// Props
 	//
 	export let isCustomWidth: boolean = false;
 	export let style: string = '';
-	export let status: KeypadLetterStatus = 'normal';
+	export let status: GuessLetterStatus = 'idle';
 
 	let backgroundStyle = '';
 	let boxShadowStyle = 'shadow-button active:shadow-button-active';
@@ -17,7 +17,7 @@
 		case 'correct':
 			backgroundStyle = 'bg-emerald-800';
 			break;
-		case 'disabled':
+		case 'wrong':
 			backgroundStyle = 'bg-stone-800';
 			textColorStyle = 'text-neutral-500';
 			boxShadowStyle = '';
@@ -25,7 +25,7 @@
 		case 'misplaced':
 			backgroundStyle = 'bg-yellow-700';
 			break;
-		case 'normal':
+		case 'idle':
 			backgroundStyle = 'bg-stone-600';
 			break;
 	}
@@ -38,7 +38,6 @@
 		!isCustomWidth && 'w-6 xxs:w-7 xs:w-9',
 		`| rounded xs:rounded-lg ${backgroundStyle}  ${boxShadowStyle} text-sm xxs:text-lg xs:text-2xl ${textColorStyle} uppercase`
 	)}
-	disabled={status === 'disabled'}
 	type="button"
 	on:click
 >

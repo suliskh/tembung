@@ -6,11 +6,9 @@ export type GuessAttempt = {
 	word: string;
 };
 
-export type KeypadLetterStatus = 'correct' | 'disabled' | 'misplaced' | 'normal';
-
 export type KeypadLetter = {
 	letter: string;
-	status: KeypadLetterStatus;
+	status: GuessLetterStatus;
 };
 
 export type WordDetail = {
