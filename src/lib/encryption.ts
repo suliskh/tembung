@@ -3,8 +3,8 @@ import type { WordDetail } from './types';
 export const SECRET_ENCRYPT_SHIFT: number = 7;
 export const SECRET_ENCRYPT_SEPARATOR: string = '•';
 
-export function encode(word: string, wordDetail: WordDetail, prevDate: Date): string {
-	let concantinatedString = [prevDate.toDateString(), word, JSON.stringify(wordDetail)].join(
+export function encode(word: string, wordDetail: WordDetail, date: Date): string {
+	let concantinatedString = [date.toISOString(), word, JSON.stringify(wordDetail)].join(
 		SECRET_ENCRYPT_SEPARATOR
 	);
 
@@ -16,7 +16,7 @@ export function encode(word: string, wordDetail: WordDetail, prevDate: Date): st
 }
 
 export function decode(encryptedString: string): {
-	prevDate: string;
+	date: string;
 	word: string;
 	wordDetail: WordDetail;
 } {
@@ -26,11 +26,11 @@ export function decode(encryptedString: string): {
 		.map((code) => String.fromCharCode(code))
 		.join('');
 
-	const [prevDate, word, wordDetail] = decryptedString.split(SECRET_ENCRYPT_SEPARATOR);
+	const [date, word, wordDetail] = decryptedString.split(SECRET_ENCRYPT_SEPARATOR);
 
 	return {
-		prevDate,
 		word,
+		date,
 		wordDetail: JSON.parse(wordDetail)
 	};
 }
