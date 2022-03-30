@@ -59,7 +59,7 @@
 			img: 'https://media-exp1.licdn.com/dms/image/C4E03AQHallzvAcPqxg/profile-displayphoto-shrink_800_800/0/1517057406296?e=1654128000&v=beta&t=PsTIMJLUS96TR2_RiLLjXceWQ-pPovrHqh8Tj7ou_RM'
 		},
 		{
-			question: 'Kaka dan bimbim adalah nama personel yang di...',
+			question: 'Kaka dan Bimbim adalah nama personel yang di...',
 			answer: 'ulang',
 			img: 'https://lingopolo.org/thai/sites/lingopolo.org.thai/files/styles/entry/public/images/2015/11/02/repeat.jpg'
 		},
