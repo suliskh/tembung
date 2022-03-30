@@ -23,7 +23,6 @@
 		if (isRevealed) {
 			let normalizedAnswer = answer.toUpperCase();
 			let isLetterInAnswer = normalizedAnswer.includes(letter);
-			console.log(letter, normalizedAnswer, isLetterInAnswer);
 
 			if (isLetterInAnswer) {
 				let isSamePos = letter === normalizedAnswer[letterIndex];
@@ -98,6 +97,8 @@
 	let currentAttempt = 0;
 	$: currentAnswer = quizzes[currentQuizIndex].answer;
 
+	$: console.log(guesses);
+
 	let appendLetterToCurrentGuess = (letter) => {
 		let isCurrentAttemptFull = guesses[currentAttempt].word.length >= currentAnswer.length;
 
@@ -122,8 +123,6 @@
 			}
 		}
 	};
-
-	$: console.log(isAnswerModalOpen);
 
 	onMount(() => {
 		isWarningModalOpen = true;
@@ -161,6 +160,7 @@
 				class="shrink-0 | py-2 px-3 rounded xs:rounded-lg bg-stone-600 shadow-button active:shadow-button-active text-sm xxs:text-lg text-neutral-100 active:text-neutral-300 uppercase"
 				on:click={() => {
 					if (currentQuizIndex < quizzes.length - 1) {
+						guesses = [{ word: '', isRevealed: false }];
 						currentQuizIndex++;
 					}
 				}}
@@ -241,7 +241,8 @@
 	>
 		<div class="px-3 py-4 | flex flex-col items-center">
 			<p class="text-xl text-center text-neutral-400">
-				Permainan ini dapat menyebabkan hipertensi, serangan jantung, dan gangguan emosi dan kejiwaan.
+				Permainan ini dapat menyebabkan hipertensi, serangan jantung, dan gangguan emosi dan
+				kejiwaan.
 			</p>
 		</div>
 	</Modal>
