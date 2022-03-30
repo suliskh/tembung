@@ -241,7 +241,7 @@
 	>
 		<div class="px-3 py-4 | flex flex-col items-center">
 			<p class="text-xl text-center text-neutral-400">
-				Memainkan permainan ini dapat menyebabkan hipertensi, serangan jantung, dan gangguan emosi dan kejiwaan.
+				Permainan ini dapat menyebabkan hipertensi, serangan jantung, dan gangguan emosi dan kejiwaan.
 			</p>
 		</div>
 	</Modal>
