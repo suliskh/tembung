@@ -166,6 +166,7 @@
 				on:click={() => {
 					if (currentQuizIndex < quizzes.length - 1) {
 						guesses = [{ word: '', isRevealed: false }];
+						currentAttempt = 0;
 						currentQuizIndex++;
 					}
 				}}
