@@ -138,6 +138,11 @@
 	});
 </script>
 
+<svelte:head>
+	{#each quizzes as quiz}
+		<link rel="preload" as="image" href={quiz.img} />
+	{/each}
+</svelte:head>
 <div class="w-screen min-h-screen | bg-surface | font-sans">
 	<main class="max-w-xl mx-auto | px-8">
 		<div class="py-10">
